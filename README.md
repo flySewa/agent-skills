@@ -5,8 +5,8 @@ A collection of [Agent Skills](https://agentskills.io) for [Open Circle](https:/
 ## Contents
 
 - [What are Agent Skills?](#what-are-agent-skills)
-- [Purpose](#purpose)
-- [Who this is for](#who-this-is-for)
+- [What These Skills Do](#what-these-skills-do)
+- [When to Use These](#when-to-use-these)
 - [Skills Included](#skills-included)
 - [Installation](#installation)
 - [Usage](#usage)
@@ -22,7 +22,7 @@ Agent Skills are a lightweight, open format for extending AI agent capabilities 
 
 Learn more at [agentskills.io](https://agentskills.io)
 
-## Purpose
+## What These Skills Do
 
 These skills provide rules for:
 
@@ -35,13 +35,13 @@ Without these skills:
 * Form behavior is not standardized
 * Agent output is inconsistent
 
-## Who this is for
+## When to Use These
 
-This repository is for developers who are:
+Use these when:
 
 * Building agents that generate, validate, or reason about structured data or forms
 * Using or evaluating Valibot or Formisch in agent workflows
-* Wanting rules for how schema and form logic is applied by the agent
+* You want rules for how schema and form logic is applied by the agent
 
 This requires an agent runtime that loads instructions from `SKILL.md` files.
 
