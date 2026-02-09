@@ -78,12 +78,10 @@ No prompt changes are required.
 
 Each skill folder contains:
 
-* `SKILL.md` – Instructions and metadata for the agent
-* `references/` – Optional supporting documentation
-* `scripts/` – Optional executable code
-* `assets/` – Optional templates or examples
-
----
+- **SKILL.md** — Instructions and metadata for the agent
+- **references/** — Additional documentation (optional)
+- **scripts/** — Executable code (optional)
+- **assets/** — Templates and resources (optional)
 
 
 ## FAQ
