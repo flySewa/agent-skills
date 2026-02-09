@@ -11,7 +11,6 @@ A collection of [Agent Skills](https://agentskills.io) for [Open Circle](https:/
 - [Installation](#installation)
 - [Usage](#usage)
 - [Skill Structure](#skill-structure)
-- [FAQ](#faq)
 - [Contributing](#contributing)
 - [About Open Circle](#about-open-circle)
 - [License](#license)
