@@ -1,6 +1,20 @@
 # Open Circle Agent Skills
 
-A collection of [Agent Skills](https://agentskills.io) for [Open Circle](https://opencircle.dev) projects. These skills help AI agents define how schema definitions, validation logic, and form behavior are handled with Valibot, Formisch, and other ecosystem tools. 
+A collection of [Agent Skills](https://agentskills.io) for [Open Circle](https://opencircle.dev) projects. These skills help AI agents define how schema definitions, validation logic, and form behavior are handled with Valibot and Formisch.
+
+## Contents
+
+- [What are Agent Skills?](#what-are-agent-skills)
+- [Purpose](#purpose)
+- [Who this is for](#who-this-is-for)
+- [Skills Included](#skills-included)
+- [Installation](#installation)
+- [Usage](#usage)
+- [Skill Structure](#skill-structure)
+- [FAQ](#faq)
+- [Contributing](#contributing)
+- [About Open Circle](#about-open-circle)
+- [License](#license)
 
 ## What are Agent Skills?
 
@@ -15,7 +29,11 @@ These skills provide rules for:
 * Defining and validating schemas with Valibot
 * Handling form state and transitions with Formisch
 
-Without these skills, schema structure and form behavior are not defined for the agent.
+Without these skills:
+
+* Schema structure is undefined
+* Form behavior is not standardized
+* Agent output is inconsistent
 
 ## Who this is for
 
@@ -46,9 +64,13 @@ Or copy individual skill folders into your project's `.skills/` directory.
 
 ## Usage
 
-1. The agent loads all available skills from the skills directory at startup.
-2. Instructions are read from each skill's `SKILL.md` file.
-3. During schema definition, validation, and form handling, the agent applies instructions.
+1. The agent loads all available skills at startup.
+2. Instructions are read from each `SKILL.md` file.
+3. The agent applies these rules during:
+
+   * Schema definition
+   * Validation
+   * Form handling
 
 No prompt changes are required.
 
@@ -63,15 +85,23 @@ Each skill folder contains:
 
 ---
 
+
 ## FAQ
 
-**Is this only for Open Circle projects?**
+### Is this only for Open Circle projects?
+
 No. Skills can be used with any agent runtime that loads instructions from `SKILL.md` files.
 
-**Do I need to modify my prompts?**
+
+
+### Do I need to modify my prompts?
+
 No. Skills are applied automatically by the agent runtime.
 
-**Can I use only one skill?**
+
+
+### Can I use only one skill?
+
 Yes. Install individual skills or ignore unused ones.
 
 ## Contributing
@@ -90,3 +120,4 @@ We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guid
 ## License
 
 This repository is licensed under the [MIT License](LICENSE.md).
+
