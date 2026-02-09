@@ -82,25 +82,6 @@ Each skill folder contains:
 - **scripts/** — Executable code (optional)
 - **assets/** — Templates and resources (optional)
 
-
-## FAQ
-
-### Is this only for Open Circle projects?
-
-No. Skills can be used with any agent runtime that loads instructions from `SKILL.md` files.
-
-
-
-### Do I need to modify my prompts?
-
-No. Skills are applied automatically by the agent runtime.
-
-
-
-### Can I use only one skill?
-
-Yes. Install individual skills or ignore unused ones.
-
 ## Contributing
 
 We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
