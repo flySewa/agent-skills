@@ -49,8 +49,8 @@ This requires an agent runtime that loads instructions from `SKILL.md` files.
 
 | Skill             | Purpose                          | When to use                                              |
 | ----------------- | -------------------------------- | -------------------------------------------------------- |
-| `valibot-usage/`  | Schema definition and validation | Validating data structures, API responses, or user input |
-| `formisch-usage/` | Form state handling              | Managing multi-step forms or structured data collection  |
+| [valibot-usage](skills/valibot-usage/)  | Schema definition and validation | Validating data structures, API responses, or user input |
+| [formisch-usage](skills/formisch-usage/)| Form state handling              | Managing multi-step forms or structured data collection  |
 
 ## Installation
 
@@ -120,4 +120,3 @@ We welcome contributions! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for guid
 ## License
 
 This repository is licensed under the [MIT License](LICENSE.md).
-
