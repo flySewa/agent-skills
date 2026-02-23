@@ -24,7 +24,7 @@ Learn more at [agentskills.io](https://agentskills.io)
 
 ## What These Skills Do
 
-These skiils teach agents the correct patterns and best practices for using Valibot and Formisch.
+These skills teach agents the correct patterns and best practices for using Valibot and Formisch.
 
 ## When to Use These
 
