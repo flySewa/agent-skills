@@ -1,4 +1,3 @@
-````skill
 ---
 name: formisch
 description: Form handling with Formisch, the type-safe form library for modern frameworks. Use when the user needs to create forms, handle form state, validate form inputs, or work with Formisch.
