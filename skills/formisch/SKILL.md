@@ -398,4 +398,525 @@ All methods follow a consistent API pattern:
 ```ts
 import { getInput, getErrors, getAllErrors } from "@formisch/react";
 
-````
+// Get field value
+const email = getInput(form, { path: ["email"] });
+
+// Get entire form input
+const allInputs = getInput(form);
+
+// Get field errors
+const emailErrors = getErrors(form, { path: ["email"] });
+
+// Get all errors across all fields
+const allErrors = getAllErrors(form);
+```
+
+### Setting Values
+
+```ts
+import { setInput, setErrors, reset } from "@formisch/react";
+
+// Set field value (updates current input, not initial)
+setInput(form, { path: ["email"], input: "new@example.com" });
+
+// Set field errors manually
+setErrors(form, { path: ["email"], errors: ["Email already taken"] });
+
+// Clear errors
+setErrors(form, { path: ["email"], errors: null });
+
+// Reset entire form
+reset(form);
+
+// Reset with new initial values
+reset(form, {
+  initialInput: { email: "", password: "" },
+});
+
+// Reset but keep current input
+reset(form, {
+  initialInput: newServerData,
+  keepInput: true,
+});
+```
+
+### Form Control
+
+```ts
+import { validate, focus, submit, handleSubmit } from "@formisch/react";
+
+// Validate form manually
+const isValid = await validate(form);
+
+// Validate and focus first error field
+await validate(form, { shouldFocus: true });
+
+// Focus a specific field
+focus(form, { path: ["email"] });
+
+// Programmatically submit form
+submit(form);
+
+// Create submit handler for external buttons
+const onExternalSubmit = handleSubmit(form, (output) => {
+  console.log(output);
+});
+```
+
+## Field Arrays
+
+For dynamic lists of fields, use `FieldArray` with array manipulation methods.
+
+### Schema
+
+```ts
+const TodoSchema = v.object({
+  heading: v.pipe(v.string(), v.nonEmpty()),
+  todos: v.pipe(
+    v.array(
+      v.object({
+        label: v.pipe(v.string(), v.nonEmpty()),
+        deadline: v.pipe(v.string(), v.nonEmpty()),
+      }),
+    ),
+    v.nonEmpty(),
+    v.maxLength(10),
+  ),
+});
+```
+
+### React Example
+
+```tsx
+import {
+  Field,
+  FieldArray,
+  Form,
+  useForm,
+  insert,
+  remove,
+  move,
+  swap,
+} from "@formisch/react";
+
+export default function TodoPage() {
+  const todoForm = useForm({
+    schema: TodoSchema,
+    initialInput: {
+      heading: "",
+      todos: [{ label: "", deadline: "" }],
+    },
+  });
+
+  return (
+    <Form of={todoForm} onSubmit={(output) => console.log(output)}>
+      <Field of={todoForm} path={["heading"]}>
+        {(field) => <input {...field.props} value={field.input} type="text" />}
+      </Field>
+
+      <FieldArray of={todoForm} path={["todos"]}>
+        {(fieldArray) => (
+          <div>
+            {fieldArray.items.map((item, index) => (
+              <div key={item}>
+                <Field of={todoForm} path={["todos", index, "label"]}>
+                  {(field) => (
+                    <input {...field.props} value={field.input} type="text" />
+                  )}
+                </Field>
+                <Field of={todoForm} path={["todos", index, "deadline"]}>
+                  {(field) => (
+                    <input {...field.props} value={field.input} type="date" />
+                  )}
+                </Field>
+                <button
+                  type="button"
+                  onClick={() =>
+                    remove(todoForm, { path: ["todos"], at: index })
+                  }
+                >
+                  Delete
+                </button>
+              </div>
+            ))}
+            {fieldArray.errors && <div>{fieldArray.errors[0]}</div>}
+          </div>
+        )}
+      </FieldArray>
+
+      <button
+        type="button"
+        onClick={() =>
+          insert(todoForm, {
+            path: ["todos"],
+            initialInput: { label: "", deadline: "" },
+          })
+        }
+      >
+        Add Todo
+      </button>
+
+      <button type="submit">Submit</button>
+    </Form>
+  );
+}
+```
+
+### Array Methods
+
+```ts
+import { insert, remove, move, swap, replace } from "@formisch/react";
+
+// Add item at end
+insert(form, { path: ["todos"], initialInput: { label: "", deadline: "" } });
+
+// Add item at specific index
+insert(form, {
+  path: ["todos"],
+  at: 0,
+  initialInput: { label: "", deadline: "" },
+});
+
+// Remove item at index
+remove(form, { path: ["todos"], at: index });
+
+// Move item from one index to another
+move(form, { path: ["todos"], from: 0, to: 3 });
+
+// Swap two items
+swap(form, { path: ["todos"], at: 0, and: 1 });
+
+// Replace item at index
+replace(form, {
+  path: ["todos"],
+  at: 0,
+  initialInput: { label: "New task", deadline: "2024-12-31" },
+});
+```
+
+## TypeScript Integration
+
+### Type Inference
+
+Types are automatically inferred from your Valibot schema:
+
+```ts
+const LoginSchema = v.object({
+  email: v.pipe(v.string(), v.email()),
+  password: v.pipe(v.string(), v.minLength(8)),
+});
+
+const form = useForm({ schema: LoginSchema });
+// form is FormStore<typeof LoginSchema>
+
+// Submit handler receives typed output
+const handleSubmit: SubmitHandler<typeof LoginSchema> = (output) => {
+  output.email; // ✓ string
+  output.password; // ✓ string
+  output.username; // ✗ TypeScript error
+};
+```
+
+### Input vs Output Types
+
+Schemas with transformations have different input and output types:
+
+```ts
+const ProfileSchema = v.object({
+  age: v.pipe(
+    v.string(), // Input: string
+    v.transform((input) => Number(input)), // Output: number
+    v.number(),
+  ),
+  birthDate: v.pipe(
+    v.string(), // Input: string
+    v.transform((input) => new Date(input)), // Output: Date
+    v.date(),
+  ),
+});
+
+// In Field: field.input is string
+// In onSubmit: output.age is number, output.birthDate is Date
+```
+
+### Type-Safe Props
+
+Pass forms to child components with proper typing:
+
+```tsx
+import type { FormStore } from "@formisch/react";
+
+type FormContentProps = {
+  of: FormStore<typeof LoginSchema>;
+};
+
+function FormContent({ of }: FormContentProps) {
+  return (
+    <Form of={of} onSubmit={(output) => console.log(output)}>
+      {/* ... */}
+    </Form>
+  );
+}
+```
+
+### Generic Field Components
+
+Create reusable field components with proper typing:
+
+```tsx
+import { useField, type FormStore } from "@formisch/react";
+import * as v from "valibot";
+
+type EmailInputProps = {
+  of: FormStore<v.GenericSchema<{ email: string }>>;
+};
+
+function EmailInput({ of }: EmailInputProps) {
+  const field = useField(of, { path: ["email"] });
+
+  return (
+    <div>
+      <input {...field.props} value={field.input} type="email" />
+      {field.errors && <div>{field.errors[0]}</div>}
+    </div>
+  );
+}
+```
+
+### Available Types
+
+```ts
+import type {
+  FormStore, // Form store type
+  FieldStore, // Field store type
+  FieldArrayStore, // Field array store type
+  SubmitHandler, // Submit handler function type
+  ValidPath, // Valid field path type
+  ValidArrayPath, // Valid array field path type
+  Schema, // Base schema type from Valibot
+} from "@formisch/react";
+```
+
+## Validation Timing
+
+### validate Option
+
+Controls when the **first** validation occurs:
+
+| Value       | Description                                |
+| ----------- | ------------------------------------------ |
+| `'initial'` | Validate immediately on form creation      |
+| `'blur'`    | Validate when field loses focus            |
+| `'input'`   | Validate on every input change             |
+| `'submit'`  | Validate only on form submission (default) |
+
+### revalidate Option
+
+Controls when validation runs **after** the first validation:
+
+| Value      | Description                                |
+| ---------- | ------------------------------------------ |
+| `'blur'`   | Revalidate when field loses focus          |
+| `'input'`  | Revalidate on every input change (default) |
+| `'submit'` | Revalidate only on form submission         |
+
+## Special Inputs
+
+### Select (Single)
+
+```tsx
+<Field of={form} path={["framework"]}>
+  {(field) => (
+    <select {...field.props}>
+      {options.map(({ label, value }) => (
+        <option key={value} value={value} selected={field.input === value}>
+          {label}
+        </option>
+      ))}
+    </select>
+  )}
+</Field>
+```
+
+### Select (Multiple)
+
+```tsx
+<Field of={form} path={["frameworks"]}>
+  {(field) => (
+    <select {...field.props} multiple>
+      {options.map(({ label, value }) => (
+        <option
+          key={value}
+          value={value}
+          selected={field.input?.includes(value)}
+        >
+          {label}
+        </option>
+      ))}
+    </select>
+  )}
+</Field>
+```
+
+### Checkbox
+
+```tsx
+<Field of={form} path={["acceptTerms"]}>
+  {(field) => <input {...field.props} type="checkbox" checked={field.input} />}
+</Field>
+```
+
+### File Input
+
+File inputs cannot be controlled. Handle via UI around them:
+
+```tsx
+<Field of={form} path={["avatar"]}>
+  {(field) => (
+    <div>
+      <input {...field.props} type="file" />
+      {field.input && <span>{field.input.name}</span>}
+    </div>
+  )}
+</Field>
+```
+
+## useField Hook
+
+For complex field components, use the `useField` hook instead of the `Field` component:
+
+```tsx
+import { useField } from "@formisch/react";
+
+function EmailInput({ form }) {
+  const field = useField(form, { path: ["email"] });
+
+  // Access field state in component logic
+  useEffect(() => {
+    if (field.errors) {
+      console.log("Email has errors:", field.errors);
+    }
+  }, [field.errors]);
+
+  return (
+    <div>
+      <input {...field.props} value={field.input} type="email" />
+      {field.errors && <div>{field.errors[0]}</div>}
+    </div>
+  );
+}
+```
+
+**When to use which:**
+
+- **`Field` component** — Multiple fields in the same component
+- **`useField` hook** — Single field with component logic access
+
+## Using Component Libraries
+
+When using component libraries that don't expose their underlying native HTML elements, you cannot spread `field.props` directly. Instead, use `field.onChange` (React) or `field.onInput` (other frameworks) to update the value programmatically:
+
+```tsx
+import { DatePicker } from "some-component-library";
+
+<Field of={form} path={["date"]}>
+  {(field) => (
+    <DatePicker
+      value={field.input}
+      onChange={(newDate) => field.onChange(newDate)}
+    />
+  )}
+</Field>;
+```
+
+The `field.onChange` method updates the field value and triggers validation, just like a native input would.
+
+This is useful for:
+
+- **Component libraries** that wrap native elements without exposing them
+- **Complex custom inputs** like date pickers, rich text editors, or color pickers
+
+## Async Submission
+
+```tsx
+const handleSubmit: SubmitHandler<typeof LoginSchema> = async (values) => {
+  try {
+    const response = await fetch("/api/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(values),
+    });
+
+    if (!response.ok) {
+      // Set server-side errors
+      const data = await response.json();
+      setErrors(form, { path: ["email"], errors: [data.error] });
+    }
+  } catch (error) {
+    console.error("Submission failed:", error);
+  }
+};
+```
+
+## Common Patterns
+
+### Loading State
+
+```tsx
+<button type="submit" disabled={form.isSubmitting}>
+  {form.isSubmitting ? "Submitting..." : "Submit"}
+</button>
+```
+
+### Submit on Enter
+
+Formisch handles this automatically via the native `<form>` element.
+
+### Reset After Success
+
+```tsx
+const handleSubmit: SubmitHandler<typeof Schema> = async (values) => {
+  await saveData(values);
+
+  // Full reset to initial state
+  reset(form);
+
+  // Or reset but keep current input values
+  reset(form, { keepInput: true });
+};
+```
+
+### Server Data Sync
+
+When server data changes, update the baseline without losing user edits:
+
+```tsx
+// After refetching data from server
+reset(form, {
+  initialInput: newServerData,
+  keepInput: true, // Keep user's current edits
+  keepTouched: true, // Keep touched state (optional)
+});
+```
+
+### Conditional Fields
+
+```tsx
+<Field of={form} path={["hasAccount"]}>
+  {(field) => <input {...field.props} type="checkbox" checked={field.input} />}
+</Field>;
+
+{
+  getInput(form, { path: ["hasAccount"] }) && (
+    <Field of={form} path={["accountId"]}>
+      {(field) => <input {...field.props} value={field.input} />}
+    </Field>
+  );
+}
+```
+
+## Additional Resources
+
+- [Formisch Documentation](https://formisch.dev/)
+- [Formisch GitHub](https://github.com/open-circle/formisch)
+- [Valibot Documentation](https://valibot.dev/)
